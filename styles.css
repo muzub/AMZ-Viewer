@@ -271,6 +271,38 @@ body {
     display: block;
 }
 
+/* Source header with copy button */
+.source-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem;
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+
+.copy-source-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.3rem 0.8rem;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.copy-source-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.copy-source-btn i {
+    font-size: var(--font-size-small);
+}
+
 /* Source code and Preview specific styles */
 .source-view {
     font-family: Consolas, Monaco, 'Andale Mono', monospace;
