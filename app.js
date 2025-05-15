@@ -213,7 +213,7 @@ async function selectFolder() {
         updateStatus('Selecting folder...');
         currentDirectoryHandle = await window.showDirectoryPicker();
         breadcrumbPath = [{ name: currentDirectoryHandle.name, handle: currentDirectoryHandle }];
-        currentPathElement.textContent = currentDirectoryHandle.name;
+        updateCurrentPath();
         displayDirectoryContents(currentDirectoryHandle);
         updateStatus(`Opened folder: ${currentDirectoryHandle.name}`);
     } catch (error) {
@@ -221,6 +221,25 @@ async function selectFolder() {
         updateStatus('Ready');
         console.log('Folder selection was cancelled or failed', error);
     }
+}
+
+// Update current path in navbar
+function updateCurrentPath() {
+    if (breadcrumbPath.length === 0) {
+        currentPathElement.textContent = 'No folder selected';
+        return;
+    }
+    
+    // Show the complete path in the navbar
+    let pathDisplay = '';
+    breadcrumbPath.forEach((item, index) => {
+        if (index > 0) {
+            pathDisplay += ' > ';
+        }
+        pathDisplay += item.name;
+    });
+    
+    currentPathElement.textContent = pathDisplay;
 }
 
 // Display contents of a directory
@@ -244,12 +263,14 @@ async function displayDirectoryContents(directoryHandle) {
             breadcrumbItem.addEventListener('click', () => {
                 // Navigate to this level in breadcrumb
                 breadcrumbPath = breadcrumbPath.slice(0, index + 1);
+                updateCurrentPath();
                 displayDirectoryContents(item.handle);
             });
             
             breadcrumbItem.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     breadcrumbPath = breadcrumbPath.slice(0, index + 1);
+                    updateCurrentPath();
                     displayDirectoryContents(item.handle);
                 }
             });
@@ -370,6 +391,7 @@ async function handleFileAction(entry) {
     if (entry.kind === 'directory') {
         // Navigate to the directory
         breadcrumbPath.push({ name: entry.name, handle: entry });
+        updateCurrentPath();
         displayDirectoryContents(entry);
     } else {
         // Display file content
@@ -429,6 +451,33 @@ function getFileIconHTML(filename) {
         default:
             return '<i class="fas fa-file" title="File"></i>';
     }
+}
+
+// Add Copy Source Button functionality
+function addCopySourceButton(content) {
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-source-btn';
+    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Source';
+    copyBtn.title = 'Copy source to clipboard';
+    
+    copyBtn.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(content);
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            updateStatus('Source code copied to clipboard');
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to copy text: ', error);
+            updateStatus('Failed to copy: ' + error);
+        }
+    });
+    
+    return copyBtn;
 }
 
 // Display file content
@@ -1001,6 +1050,13 @@ async function displayHTML(file) {
     sourceContent.id = 'source';
     sourceContent.className = `tab-content ${settings.defaultViewHTML === 'source' ? 'active' : ''}`;
     
+    // Add source header with copy button
+    const sourceHeader = document.createElement('div');
+    sourceHeader.className = 'source-header';
+    const copyBtn = addCopySourceButton(content);
+    sourceHeader.appendChild(copyBtn);
+    sourceContent.appendChild(sourceHeader);
+    
     const pre = document.createElement('pre');
     pre.className = 'source-view language-html';
     pre.textContent = content;
@@ -1063,6 +1119,13 @@ async function displayMarkdown(file) {
     sourceContent.id = 'source';
     sourceContent.className = `tab-content ${settings.defaultViewMD === 'source' ? 'active' : ''}`;
     
+    // Add source header with copy button
+    const sourceHeader = document.createElement('div');
+    sourceHeader.className = 'source-header';
+    const copyBtn = addCopySourceButton(content);
+    sourceHeader.appendChild(copyBtn);
+    sourceContent.appendChild(sourceHeader);
+    
     const pre = document.createElement('pre');
     pre.className = 'source-view language-markdown';
     pre.textContent = content;
@@ -1124,6 +1187,13 @@ async function displayCSV(file) {
     const sourceContent = document.createElement('div');
     sourceContent.id = 'source';
     sourceContent.className = `tab-content ${settings.defaultViewCSV === 'source' ? 'active' : ''}`;
+    
+    // Add source header with copy button
+    const sourceHeader = document.createElement('div');
+    sourceHeader.className = 'source-header';
+    const copyBtn = addCopySourceButton(content);
+    sourceHeader.appendChild(copyBtn);
+    sourceContent.appendChild(sourceHeader);
     
     const pre = document.createElement('pre');
     pre.className = 'source-view';
@@ -1225,6 +1295,13 @@ async function displayText(file, fileType) {
     
     const container = document.createElement('div');
     container.className = 'content-container';
+    
+    // Add source header with copy button for text files
+    const sourceHeader = document.createElement('div');
+    sourceHeader.className = 'source-header';
+    const copyBtn = addCopySourceButton(content);
+    sourceHeader.appendChild(copyBtn);
+    container.appendChild(sourceHeader);
     
     const pre = document.createElement('pre');
     pre.className = `source-view ${settings.syntaxHighlight ? `language-${fileType}` : ''}`;
@@ -1355,6 +1432,7 @@ function handleGlobalKeyDown(e) {
     if (e.key === 'Backspace' && breadcrumbPath.length > 1 && 
         e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         breadcrumbPath.pop();
+        updateCurrentPath();
         displayDirectoryContents(breadcrumbPath[breadcrumbPath.length - 1].handle);
         e.preventDefault();
         return;
