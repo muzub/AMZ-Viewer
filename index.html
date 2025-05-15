@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMZViewer</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Markdown parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Syntax highlighter -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-file-alt"></i>
+                <span>AMZViewer</span>
+                <span id="current-path" class="path-indicator">No folder selected</span>
+            </div>
+            
+            <div class="nav-actions">
+                <button id="select-folder-btn" class="nav-btn" title="Open Folder (Ctrl+O)">
+                    <i class="fas fa-folder-open"></i>
+                </button>
+                
+                <div class="nav-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search..." title="Search files (Ctrl+F)">
+                </div>
+                
+                <button id="toggle-settings-btn" class="nav-btn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                
+                <button id="toggle-shortcuts-btn" class="nav-btn" title="Keyboard Shortcuts (?)">
+                    <i class="fas fa-keyboard"></i>
+                </button>
+            </div>
+        </nav>
+        
+        <div class="main-content">
+            <div class="file-list-container">
+                <div id="file-list" tabindex="0">
+                    <div class="placeholder">
+                        <i class="fas fa-arrow-right"></i> 
+                        Click the folder icon to select a folder
+                    </div>
+                </div>
+            </div>
+            
+            <div class="file-viewer" id="file-viewer">
+                <div class="placeholder">
+                    <i class="fas fa-file-alt fa-3x"></i>
+                    <p>Select a file to view its content</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div id="status-message">Ready</div>
+            <div id="selected-info"></div>
+        </div>
+    </div>
+    
+    <!-- Settings Panel -->
+    <div id="settings-panel" class="side-panel">
+        <div class="panel-header">
+            <h2><i class="fas fa-cog"></i> Settings</h2>
+            <button id="close-settings" class="close-btn" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-content">
+            <div class="setting-group">
+                <h3>Display Settings</h3>
+                
+                <div class="setting-item">
+                    <label for="default-view-html">Default HTML view:</label>
+                    <select id="default-view-html">
+                        <option value="preview">Preview</option>
+                        <option value="source">Source</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="default-view-md">Default Markdown view:</label>
+                    <select id="default-view-md">
+                        <option value="preview">Preview</option>
+                        <option value="source">Source</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="default-view-csv">Default CSV view:</label>
+                    <select id="default-view-csv">
+                        <option value="table">Table</option>
+                        <option value="source">Source</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="syntax-highlight">Syntax highlighting:</label>
+                    <input type="checkbox" id="syntax-highlight" checked>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3>Media Settings</h3>
+                
+                <div class="setting-item">
+                    <label for="video-autoplay">Video autoplay:</label>
+                    <input type="checkbox" id="video-autoplay">
+                </div>
+                
+                <div class="setting-item">
+                    <label for="video-volume">Default volume:</label>
+                    <input type="range" id="video-volume" min="0" max="1" step="0.1" value="0.7">
+                    <span id="video-volume-value">70%</span>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="image-fit">Default image fit:</label>
+                    <select id="image-fit">
+                        <option value="contain">Fit to view</option>
+                        <option value="actual">Actual size</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="pdf-zoom">Default PDF zoom:</label>
+                    <select id="pdf-zoom">
+                        <option value="page-fit">Fit to page</option>
+                        <option value="page-width">Fit to width</option>
+                        <option value="auto">Auto</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3>Appearance</h3>
+                
+                <div class="setting-item">
+                    <label for="theme-select">Theme:</label>
+                    <select id="theme-select">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="system">System default</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="font-size">Font size:</label>
+                    <input type="range" id="font-size" min="12" max="24" value="16">
+                    <span id="font-size-value">16px</span>
+                </div>
+            </div>
+            
+            <div class="setting-group">
+                <h3>CSV Options</h3>
+                
+                <div class="setting-item">
+                    <label for="csv-delimiter">Delimiter:</label>
+                    <select id="csv-delimiter">
+                        <option value=",">Comma (,)</option>
+                        <option value=";">Semicolon (;)</option>
+                        <option value="\t">Tab</option>
+                    </select>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="csv-header">First row as header:</label>
+                    <input type="checkbox" id="csv-header" checked>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Shortcuts Panel -->
+    <div id="shortcuts-panel" class="side-panel">
+        <div class="panel-header">
+            <h2><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h2>
+            <button id="close-shortcuts" class="close-btn" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="panel-content">
+            <table class="shortcuts-table">
+                <tr>
+                    <th colspan="2">Navigation</th>
+                </tr>
+                <tr>
+                    <td><kbd>↑</kbd> / <kbd>↓</kbd></td>
+                    <td>Navigate file list</td>
+                </tr>
+                <tr>
+                    <td><kbd>Enter</kbd></td>
+                    <td>Open selected file/folder</td>
+                </tr>
+                <tr>
+                    <td><kbd>Backspace</kbd></td>
+                    <td>Go to parent folder</td>
+                </tr>
+                <tr>
+                    <td><kbd>Home</kbd> / <kbd>End</kbd></td>
+                    <td>Jump to first/last file</td>
+                </tr>
+                
+                <tr>
+                    <th colspan="2">Media Controls</th>
+                </tr>
+                <tr>
+                    <td><kbd>Space</kbd></td>
+                    <td>Play/Pause video</td>
+                </tr>
+                <tr>
+                    <td><kbd>→</kbd> / <kbd>←</kbd></td>
+                    <td>Skip forward/back 5 seconds</td>
+                </tr>
+                <tr>
+                    <td><kbd>+</kbd> / <kbd>-</kbd></td>
+                    <td>Zoom in/out</td>
+                </tr>
+                <tr>
+                    <td><kbd>0</kbd></td>
+                    <td>Reset zoom/fit to view</td>
+                </tr>
+                <tr>
+                    <td><kbd>F</kbd></td>
+                    <td>Toggle fullscreen</td>
+                </tr>
+                
+                <tr>
+                    <th colspan="2">General</th>
+                </tr>
+                <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>O</kbd></td>
+                    <td>Open folder</td>
+                </tr>
+                <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+                    <td>Search files</td>
+                </tr>
+                <tr>
+                    <td><kbd>Ctrl</kbd> + <kbd>S</kbd></td>
+                    <td>Toggle Source/Preview</td>
+                </tr>
+                <tr>
+                    <td><kbd>,</kbd> (comma)</td>
+                    <td>Open settings</td>
+                </tr>
+                <tr>
+                    <td><kbd>?</kbd></td>
+                    <td>Show/hide shortcuts</td>
+                </tr>
+                <tr>
+                    <td><kbd>Esc</kbd></td>
+                    <td>Close panels/exit fullscreen</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
