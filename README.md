@@ -14,7 +14,6 @@
 - **PDF Viewer**: Menampilkan file PDF langsung di browser.
 - **Image Viewer**: Mendukung berbagai format gambar seperti PNG, JPG, dan lainnya.
 - **Responsive Design**: Tampilan yang optimal untuk desktop dan perangkat mobile.
-- **Grid & List View**: Opsi untuk melihat file dalam tampilan grid (thumbnail) atau daftar.
 
 ## Teknologi yang Digunakan
 
@@ -54,36 +53,6 @@
 Anda dapat melihat aplikasi ini langsung melalui **GitHub Pages**:
 [AMZ Viewer Demo](https://muzub.github.io/AMZ-Viewer)
 
-## Kontribusi
-
-Kontribusi sangat diterima! Jika Anda ingin menambahkan fitur atau memperbaiki bug, silakan ikuti langkah berikut:
-
-1. Fork repository ini.
-2. Buat branch baru untuk fitur atau perbaikan Anda:
-   ```bash
-   git checkout -b feature-nama-fitur
-   ```
-3. Commit perubahan Anda:
-   ```bash
-   git commit -m "Menambahkan fitur X"
-   ```
-4. Push ke branch Anda:
-   ```bash
-   git push origin feature-nama-fitur
-   ```
-5. Buat Pull Request ke branch `main`.
-
-## Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](LICENSE). Anda bebas menggunakan, memodifikasi, dan mendistribusikan kode ini dengan tetap mencantumkan atribusi kepada penulis asli.
-
-## Kontak
-
-Jika Anda memiliki pertanyaan atau masukan, jangan ragu untuk menghubungi saya melalui [GitHub Issues](https://github.com/muzub/AMZ-Viewer/issues).
-
----
-
-Happy coding! 🚀
 ```
 
 ### Penyesuaian
