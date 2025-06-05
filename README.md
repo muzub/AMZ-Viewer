@@ -53,7 +53,4 @@
 Anda dapat melihat aplikasi ini langsung melalui **GitHub Pages**:
 [AMZ Viewer Demo](https://muzub.github.io/AMZ-Viewer)
 
-```
 
-### Penyesuaian
-- Jika Anda memiliki kebutuhan tambahan seperti menambahkan dokumentasi API (jika ada backend) atau memperluas deskripsi fitur tertentu, beri tahu saya agar saya bisa melengkapinya!
